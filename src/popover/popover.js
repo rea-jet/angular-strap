@@ -134,6 +134,11 @@ angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip'])
         // Initialize popover
         popover = $popover(element, options);
 
+        scope.$on('bs.placement', function() {
+          requestAnimationFrame(function() {
+            popover && popover.$applyPlacement();
+          });
+        });
         // Garbage collection
         scope.$on('$destroy', function () {
           if (popover) popover.destroy();
