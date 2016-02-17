@@ -141,6 +141,8 @@ angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip'])
         });
 
         scope.$on('$routeChangeStart', popover.hide);
+        scope.$on('bs.popover.hide', popover.hide);
+
         // Garbage collection
         scope.$on('$destroy', function () {
           if (popover) popover.destroy();
