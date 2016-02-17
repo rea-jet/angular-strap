@@ -160,6 +160,8 @@ angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip'])
             popover && popover.$applyPlacement();
           });
         });
+
+        scope.$on('$routeChangeStart', popover.hide);
         // Garbage collection
         scope.$on('$destroy', function () {
           if (popover) popover.destroy();
