@@ -30,7 +30,7 @@ angular.module('mgcrea.ngStrap.helpers.parseOptions', [])
         var valuesFn;
 
         $parseOptions.init = function () {
-          $parseOptions.$match = match = attr.match(options.regexp);
+          $parseOptions.$match = match = attr.match(options.regexp) || [];
           displayFn = $parse(match[2] || match[1]);
           valueName = match[4] || match[6];
           keyName = match[5];
