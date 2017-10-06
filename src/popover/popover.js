@@ -1,10 +1,9 @@
 'use strict';
 
-angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip'])
-
+angular
+  .module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip'])
   .provider('$popover', function () {
-
-    var defaults = this.defaults = {
+    var defaults = (this.defaults = {
       animation: 'am-fade',
       customClass: '',
       // uncommenting the next two lines will break backwards compatability
@@ -21,13 +20,12 @@ angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip'])
       title: '',
       content: '',
       delay: 0,
-      autoClose: false
-    };
+      autoClose: false,
+      showTimeout: false
+    });
 
     this.$get = function ($tooltip) {
-
       function PopoverFactory (element, config) {
-
         // Common vars
         var options = angular.extend({}, defaults, config);
 
@@ -39,44 +37,65 @@ angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip'])
         }
 
         return $popover;
-
       }
 
       return PopoverFactory;
-
     };
-
   })
-
   .directive('bsPopover', function ($window, $sce, $popover) {
-
-    var requestAnimationFrame = $window.requestAnimationFrame || $window.setTimeout;
+    var requestAnimationFrame =
+      $window.requestAnimationFrame || $window.setTimeout;
 
     return {
       restrict: 'EAC',
       scope: true,
       link: function postLink (scope, element, attr) {
-
         var popover;
         // Directive options
         var options = {scope: scope};
-        angular.forEach(['template', 'templateUrl', 'controller', 'controllerAs', 'contentTemplate', 'placement', 'container', 'delay', 'trigger', 'html', 'animation', 'customClass', 'autoClose', 'id', 'prefixClass', 'prefixEvent', 'bsEnabled'], function (key) {
-          if (angular.isDefined(attr[key])) options[key] = attr[key];
-        });
+        angular.forEach(
+          [
+            'template',
+            'templateUrl',
+            'controller',
+            'controllerAs',
+            'contentTemplate',
+            'placement',
+            'container',
+            'delay',
+            'trigger',
+            'html',
+            'animation',
+            'customClass',
+            'autoClose',
+            'id',
+            'prefixClass',
+            'prefixEvent',
+            'bsEnabled',
+            'showTimeout'
+          ],
+          function (key) {
+            if (angular.isDefined(attr[key])) options[key] = attr[key];
+          }
+        );
 
         // use string regex match boolean attr falsy values, leave truthy values be
         var falseValueRegExp = /^(false|0|)$/i;
         angular.forEach(['html', 'container', 'autoClose'], function (key) {
-          if (angular.isDefined(attr[key]) && falseValueRegExp.test(attr[key])) options[key] = false;
+          if (angular.isDefined(attr[key]) && falseValueRegExp.test(attr[key]))
+            options[key] = false;
         });
 
         // bind functions from the attrs to the show and hide events
-        angular.forEach(['onBeforeShow', 'onShow', 'onBeforeHide', 'onHide'], function (key) {
-          var bsKey = 'bs' + key.charAt(0).toUpperCase() + key.slice(1);
-          if (angular.isDefined(attr[bsKey])) {
-            options[key] = scope.$eval(attr[bsKey]);
+        angular.forEach(
+          ['onBeforeShow', 'onShow', 'onBeforeHide', 'onHide'],
+          function (key) {
+            var bsKey = 'bs' + key.charAt(0).toUpperCase() + key.slice(1);
+            if (angular.isDefined(attr[bsKey])) {
+              options[key] = scope.$eval(attr[bsKey]);
+            }
           }
-        });
+        );
 
         // should not parse target attribute (anchor tag), only data-target #1454
         var dataTarget = element.attr('data-target');
@@ -104,25 +123,30 @@ angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip'])
 
         // Support scope as an object
         if (attr.bsPopover) {
-          scope.$watch(attr.bsPopover, function (newValue, oldValue) {
-            if (angular.isObject(newValue)) {
-              angular.extend(scope, newValue);
-            } else {
-              scope.content = newValue;
-            }
-            if (angular.isDefined(oldValue)) {
-              requestAnimationFrame(function () {
-                if (popover) popover.$applyPlacement();
-              });
-            }
-          }, true);
+          scope.$watch(
+            attr.bsPopover,
+            function (newValue, oldValue) {
+              if (angular.isObject(newValue)) {
+                angular.extend(scope, newValue);
+              } else {
+                scope.content = newValue;
+              }
+              if (angular.isDefined(oldValue)) {
+                requestAnimationFrame(function () {
+                  if (popover) popover.$applyPlacement();
+                });
+              }
+            },
+            true
+          );
         }
 
         // Visibility binding support
         if (attr.bsShow) {
           scope.$watch(attr.bsShow, function (newValue, oldValue) {
             if (!popover || !angular.isDefined(newValue)) return;
-            if (angular.isString(newValue)) newValue = !!newValue.match(/true|,?(popover),?/i);
+            if (angular.isString(newValue))
+              newValue = !!newValue.match(/true|,?(popover),?/i);
             if (newValue === true) {
               popover.show();
             } else {
@@ -135,7 +159,8 @@ angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip'])
         if (attr.bsEnabled) {
           scope.$watch(attr.bsEnabled, function (newValue) {
             if (!popover || !angular.isDefined(newValue)) return;
-            if (angular.isString(newValue)) newValue = !!newValue.match(/true|1|,?(popover),?/i);
+            if (angular.isString(newValue))
+              newValue = !!newValue.match(/true|1|,?(popover),?/i);
             if (newValue === false) {
               popover.setEnabled(false);
             } else {
@@ -155,8 +180,8 @@ angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip'])
         // Initialize popover
         popover = $popover(element, options);
 
-        scope.$on('bs.placement', function() {
-          requestAnimationFrame(function() {
+        scope.$on('bs.placement', function () {
+          requestAnimationFrame(function () {
             popover && popover.$applyPlacement();
           });
         });
@@ -170,8 +195,6 @@ angular.module('mgcrea.ngStrap.popover', ['mgcrea.ngStrap.tooltip'])
           options = null;
           popover = null;
         });
-
       }
     };
-
   });
