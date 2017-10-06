@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.12 - 2017-01-26
+ * @version v2.3.7-rea3 - 2017-10-06
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -23,6 +23,7 @@ angular.module('mgcrea.ngStrap.tooltip', [ 'mgcrea.ngStrap.core', 'mgcrea.ngStra
     keyboard: false,
     html: false,
     show: false,
+    showTimeout: false,
     title: '',
     type: '',
     delay: 0,
@@ -40,6 +41,7 @@ angular.module('mgcrea.ngStrap.tooltip', [ 'mgcrea.ngStrap.core', 'mgcrea.ngStra
     var isTouch = 'createTouch' in $window.document && isNative;
     var $body = angular.element($window.document);
     function TooltipFactory(element, config) {
+      debugger;
       var $tooltip = {};
       var options = $tooltip.$options = angular.extend({}, defaults, config);
       var promise = $tooltip.$promise = $bsCompiler.compile(options);
@@ -267,35 +269,38 @@ angular.module('mgcrea.ngStrap.tooltip', [ 'mgcrea.ngStrap.core', 'mgcrea.ngStra
         options.viewport = viewport;
       };
       $tooltip.$applyPlacement = function() {
-        if (!tipElement) return;
-        var placement = options.placement;
-        var autoToken = /\s?auto?\s?/i;
-        var autoPlace = autoToken.test(placement);
-        if (autoPlace) {
-          placement = placement.replace(autoToken, '') || defaults.placement;
-        }
-        tipElement.addClass(options.placement);
-        var elementPosition = getPosition();
-        var tipWidth = tipElement.prop('offsetWidth');
-        var tipHeight = tipElement.prop('offsetHeight');
-        $tooltip.$viewport = options.viewport && findElement(options.viewport.selector || options.viewport);
-        if (autoPlace) {
-          var originalPlacement = placement;
-          var viewportPosition = getPosition($tooltip.$viewport);
-          if (/bottom/.test(originalPlacement) && elementPosition.bottom + tipHeight > viewportPosition.bottom) {
-            placement = originalPlacement.replace('bottom', 'top');
-          } else if (/top/.test(originalPlacement) && elementPosition.top - tipHeight < viewportPosition.top) {
-            placement = originalPlacement.replace('top', 'bottom');
+        return options.showTimeout ? $timeout(run, 50) : run();
+        function run() {
+          if (!tipElement) return;
+          var placement = options.placement;
+          var autoToken = /\s?auto?\s?/i;
+          var autoPlace = autoToken.test(placement);
+          if (autoPlace) {
+            placement = placement.replace(autoToken, '') || defaults.placement;
           }
-          if (/left/.test(originalPlacement) && elementPosition.left - tipWidth < viewportPosition.left) {
-            placement = placement.replace('left', 'right');
-          } else if (/right/.test(originalPlacement) && elementPosition.right + tipWidth > viewportPosition.width) {
-            placement = placement.replace('right', 'left');
+          tipElement.addClass(options.placement);
+          var elementPosition = getPosition();
+          var tipWidth = tipElement.prop('offsetWidth');
+          var tipHeight = tipElement.prop('offsetHeight');
+          $tooltip.$viewport = options.viewport && findElement(options.viewport.selector || options.viewport);
+          if (autoPlace) {
+            var originalPlacement = placement;
+            var viewportPosition = getPosition($tooltip.$viewport);
+            if (/bottom/.test(originalPlacement) && elementPosition.bottom + tipHeight > viewportPosition.bottom) {
+              placement = originalPlacement.replace('bottom', 'top');
+            } else if (/top/.test(originalPlacement) && elementPosition.top - tipHeight < viewportPosition.top) {
+              placement = originalPlacement.replace('top', 'bottom');
+            }
+            if (/left/.test(originalPlacement) && elementPosition.left - tipWidth < viewportPosition.left) {
+              placement = placement.replace('left', 'right');
+            } else if (/right/.test(originalPlacement) && elementPosition.right + tipWidth > viewportPosition.width) {
+              placement = placement.replace('right', 'left');
+            }
+            tipElement.removeClass(originalPlacement).addClass(placement);
           }
-          tipElement.removeClass(originalPlacement).addClass(placement);
+          var tipPosition = getCalculatedOffset(placement, elementPosition, tipWidth, tipHeight);
+          applyPlacement(tipPosition, placement);
         }
-        var tipPosition = getCalculatedOffset(placement, elementPosition, tipWidth, tipHeight);
-        applyPlacement(tipPosition, placement);
       };
       $tooltip.$onKeyUp = function(evt) {
         if (evt.which === 27 && $tooltip.$isShown) {
@@ -494,25 +499,27 @@ angular.module('mgcrea.ngStrap.tooltip', [ 'mgcrea.ngStrap.core', 'mgcrea.ngStra
             });
           }
         }, offset), 0);
-        var actualWidth = tip.offsetWidth;
-        var actualHeight = tip.offsetHeight;
-        if (placement === 'top' && actualHeight !== height) {
-          offset.top = offset.top + height - actualHeight;
-        }
-        if (/top-left|top-right|bottom-left|bottom-right/.test(placement)) return;
-        var delta = getViewportAdjustedDelta(placement, offset, actualWidth, actualHeight);
-        if (delta.left) {
-          offset.left += delta.left;
-        } else {
-          offset.top += delta.top;
-        }
-        dimensions.setOffset(tip, offset);
-        if (/top|right|bottom|left/.test(placement)) {
-          var isVertical = /top|bottom/.test(placement);
-          var arrowDelta = isVertical ? delta.left * 2 - width + actualWidth : delta.top * 2 - height + actualHeight;
-          var arrowOffsetPosition = isVertical ? 'offsetWidth' : 'offsetHeight';
-          replaceArrow(arrowDelta, tip[arrowOffsetPosition], isVertical);
-        }
+        $timeout(function() {
+          var actualWidth = tip.offsetWidth;
+          var actualHeight = tip.offsetHeight;
+          if (placement === 'top' && actualHeight !== height) {
+            offset.top = offset.top + height - actualHeight;
+          }
+          if (/top-left|top-right|bottom-left|bottom-right/.test(placement)) return;
+          var delta = getViewportAdjustedDelta(placement, offset, actualWidth, actualHeight);
+          if (delta.left) {
+            offset.left += delta.left;
+          } else {
+            offset.top += delta.top;
+          }
+          dimensions.setOffset(tip, offset);
+          if (/top|right|bottom|left/.test(placement)) {
+            var isVertical = /top|bottom/.test(placement);
+            var arrowDelta = isVertical ? delta.left * 2 - width + actualWidth : delta.top * 2 - height + actualHeight;
+            var arrowOffsetPosition = isVertical ? 'offsetWidth' : 'offsetHeight';
+            replaceArrow(arrowDelta, tip[arrowOffsetPosition], isVertical);
+          }
+        }, 50);
       }
       function getViewportAdjustedDelta(placement, position, actualWidth, actualHeight) {
         var delta = {
@@ -583,7 +590,7 @@ angular.module('mgcrea.ngStrap.tooltip', [ 'mgcrea.ngStrap.core', 'mgcrea.ngStra
       var options = {
         scope: scope
       };
-      angular.forEach([ 'template', 'templateUrl', 'controller', 'controllerAs', 'titleTemplate', 'placement', 'container', 'delay', 'trigger', 'html', 'animation', 'backdropAnimation', 'type', 'customClass', 'id' ], function(key) {
+      angular.forEach([ 'template', 'templateUrl', 'controller', 'controllerAs', 'titleTemplate', 'placement', 'container', 'delay', 'trigger', 'html', 'animation', 'backdropAnimation', 'type', 'customClass', 'id', 'showTimeout' ], function(key) {
         if (angular.isDefined(attr[key])) options[key] = attr[key];
       });
       var falseValueRegExp = /^(false|0|)$/i;

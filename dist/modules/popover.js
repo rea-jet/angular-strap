@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.12 - 2017-01-26
+ * @version v2.3.7-rea3 - 2017-10-06
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -22,7 +22,8 @@ angular.module('mgcrea.ngStrap.popover', [ 'mgcrea.ngStrap.tooltip' ]).provider(
     title: '',
     content: '',
     delay: 0,
-    autoClose: false
+    autoClose: false,
+    showTimeout: false
   };
   this.$get = [ '$tooltip', function($tooltip) {
     function PopoverFactory(element, config) {
@@ -45,7 +46,7 @@ angular.module('mgcrea.ngStrap.popover', [ 'mgcrea.ngStrap.tooltip' ]).provider(
       var options = {
         scope: scope
       };
-      angular.forEach([ 'template', 'templateUrl', 'controller', 'controllerAs', 'contentTemplate', 'placement', 'container', 'delay', 'trigger', 'html', 'animation', 'customClass', 'autoClose', 'id', 'prefixClass', 'prefixEvent', 'bsEnabled' ], function(key) {
+      angular.forEach([ 'template', 'templateUrl', 'controller', 'controllerAs', 'contentTemplate', 'placement', 'container', 'delay', 'trigger', 'html', 'animation', 'customClass', 'autoClose', 'id', 'prefixClass', 'prefixEvent', 'bsEnabled', 'showTimeout' ], function(key) {
         if (angular.isDefined(attr[key])) options[key] = attr[key];
       });
       var falseValueRegExp = /^(false|0|)$/i;
@@ -121,6 +122,13 @@ angular.module('mgcrea.ngStrap.popover', [ 'mgcrea.ngStrap.tooltip' ]).provider(
         });
       }
       popover = $popover(element, options);
+      scope.$on('bs.placement', function() {
+        requestAnimationFrame(function() {
+          popover && popover.$applyPlacement();
+        });
+      });
+      scope.$on('$routeChangeStart', popover.hide);
+      scope.$on('bs.popover.hide', popover.hide);
       scope.$on('$destroy', function() {
         if (popover) popover.destroy();
         options = null;

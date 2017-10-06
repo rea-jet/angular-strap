@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.12 - 2017-01-26
+ * @version v2.3.7-rea3 - 2017-10-06
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -116,7 +116,7 @@ angular.module('mgcrea.ngStrap.button', []).provider('$button', function() {
           activeElement.toggleClass(options.activeClass, isActive);
         });
       };
-      element.bind(options.toggleEvent, function() {
+      activeElement.bind(options.toggleEvent, function() {
         scope.$apply(function() {
           controller.$setViewValue(value);
           controller.$render();
