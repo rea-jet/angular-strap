@@ -22,6 +22,7 @@ angular
       html: false,
       show: false,
       showTimeout: false,
+      showTimeoutTime: 50,
       title: '',
       type: '',
       delay: 0,
@@ -400,7 +401,7 @@ angular
         // Protected methods
 
         $tooltip.$applyPlacement = function () {
-          return options.showTimeout ? $timeout(run, 50) : run();
+          return options.showTimeout ? $timeout(run, options.showTimeoutTime) : run();
 
           function run () {
             if (!tipElement) return;
@@ -930,7 +931,8 @@ angular
             'type',
             'customClass',
             'id',
-            'showTimeout'
+            'showTimeout',
+            'showTimeoutTime'
           ],
           function (key) {
             if (angular.isDefined(attr[key])) options[key] = attr[key];
