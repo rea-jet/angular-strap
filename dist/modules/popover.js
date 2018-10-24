@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.7-rea3 - 2017-10-06
+ * @version v2.3.8-rea1 - 2018-10-24
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -23,7 +23,8 @@ angular.module('mgcrea.ngStrap.popover', [ 'mgcrea.ngStrap.tooltip' ]).provider(
     content: '',
     delay: 0,
     autoClose: false,
-    showTimeout: false
+    showTimeout: false,
+    showTimeoutTime: 50
   };
   this.$get = [ '$tooltip', function($tooltip) {
     function PopoverFactory(element, config) {
@@ -46,7 +47,7 @@ angular.module('mgcrea.ngStrap.popover', [ 'mgcrea.ngStrap.tooltip' ]).provider(
       var options = {
         scope: scope
       };
-      angular.forEach([ 'template', 'templateUrl', 'controller', 'controllerAs', 'contentTemplate', 'placement', 'container', 'delay', 'trigger', 'html', 'animation', 'customClass', 'autoClose', 'id', 'prefixClass', 'prefixEvent', 'bsEnabled', 'showTimeout' ], function(key) {
+      angular.forEach([ 'template', 'templateUrl', 'controller', 'controllerAs', 'contentTemplate', 'placement', 'container', 'delay', 'trigger', 'html', 'animation', 'customClass', 'autoClose', 'id', 'prefixClass', 'prefixEvent', 'bsEnabled', 'showTimeout', 'showTimeoutTime' ], function(key) {
         if (angular.isDefined(attr[key])) options[key] = attr[key];
       });
       var falseValueRegExp = /^(false|0|)$/i;

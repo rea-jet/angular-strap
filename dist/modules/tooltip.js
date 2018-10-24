@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.7-rea3 - 2017-10-06
+ * @version v2.3.8-rea1 - 2018-10-24
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -24,6 +24,7 @@ angular.module('mgcrea.ngStrap.tooltip', [ 'mgcrea.ngStrap.core', 'mgcrea.ngStra
     html: false,
     show: false,
     showTimeout: false,
+    showTimeoutTime: 50,
     title: '',
     type: '',
     delay: 0,
@@ -269,7 +270,7 @@ angular.module('mgcrea.ngStrap.tooltip', [ 'mgcrea.ngStrap.core', 'mgcrea.ngStra
         options.viewport = viewport;
       };
       $tooltip.$applyPlacement = function() {
-        return options.showTimeout ? $timeout(run, 50) : run();
+        return options.showTimeout ? $timeout(run, options.showTimeoutTime) : run();
         function run() {
           if (!tipElement) return;
           var placement = options.placement;
@@ -590,7 +591,7 @@ angular.module('mgcrea.ngStrap.tooltip', [ 'mgcrea.ngStrap.core', 'mgcrea.ngStra
       var options = {
         scope: scope
       };
-      angular.forEach([ 'template', 'templateUrl', 'controller', 'controllerAs', 'titleTemplate', 'placement', 'container', 'delay', 'trigger', 'html', 'animation', 'backdropAnimation', 'type', 'customClass', 'id', 'showTimeout' ], function(key) {
+      angular.forEach([ 'template', 'templateUrl', 'controller', 'controllerAs', 'titleTemplate', 'placement', 'container', 'delay', 'trigger', 'html', 'animation', 'backdropAnimation', 'type', 'customClass', 'id', 'showTimeout', 'showTimeoutTime' ], function(key) {
         if (angular.isDefined(attr[key])) options[key] = attr[key];
       });
       var falseValueRegExp = /^(false|0|)$/i;
