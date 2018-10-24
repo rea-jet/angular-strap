@@ -21,7 +21,8 @@ angular
       content: '',
       delay: 0,
       autoClose: false,
-      showTimeout: false
+      showTimeout: false,
+      showTimeoutTime: 50,
     });
 
     this.$get = function ($tooltip) {
@@ -72,7 +73,8 @@ angular
             'prefixClass',
             'prefixEvent',
             'bsEnabled',
-            'showTimeout'
+            'showTimeout',
+            'showTimeoutTime'
           ],
           function (key) {
             if (angular.isDefined(attr[key])) options[key] = attr[key];
